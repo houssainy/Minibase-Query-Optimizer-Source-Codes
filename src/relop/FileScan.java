@@ -39,6 +39,8 @@ public class FileScan extends Iterator {
 	 * Restarts the iterator, i.e. as if it were just constructed.
 	 */
 	public void restart() {
+		if(isOpen())
+			heapScan.close();
 		heapScan = heapFile.openScan();
 	}
 

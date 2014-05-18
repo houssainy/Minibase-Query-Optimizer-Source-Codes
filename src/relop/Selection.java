@@ -19,12 +19,12 @@ public class Selection extends Iterator {
 		this.iterator = iter;
 		this.preds = preds;
 
-		setSchema(iter.getSchema());
+		this.setSchema(iter.getSchema());
 
-		prepareNext();
+		prepareNextTuple();
 	}
 
-	private void prepareNext() {
+	private void prepareNextTuple() {
 
 		currentTuple = null;
 		boolean isSelection;
@@ -55,7 +55,7 @@ public class Selection extends Iterator {
 	 * child iterators, and increases the indent depth along the way.
 	 */
 	public void explain(int depth) {
-		iterator.explain(depth);
+		throw new UnsupportedOperationException("Not implemented");
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class Selection extends Iterator {
 	 */
 	public void restart() {
 		iterator.restart();
-		prepareNext();
+		prepareNextTuple();
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class Selection extends Iterator {
 		if (currentTuple != null) { // if no selection has been found, - for
 									// initialization of the class -
 			Tuple tuple = currentTuple;
-			prepareNext();
+			prepareNextTuple();
 			return tuple;
 		}
 
