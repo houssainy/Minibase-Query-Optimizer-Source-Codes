@@ -41,7 +41,6 @@ class RelOperatorTest extends TestDriver {
 	 * Test application entry point; runs all tests.
 	 */
 	public static void main(String argv[]) {
-
 		// create a clean Minibase instance
 		RelOperatorTest rot = new RelOperatorTest();
 		rot.create_minibase();
