@@ -10,8 +10,6 @@ public class Selection extends Iterator {
 	private Iterator iterator;
 	private Predicate[] preds;
 
-	private boolean hasNext = true;
-	
 	private Tuple currentTuple = null;
 
 	/**
@@ -20,10 +18,37 @@ public class Selection extends Iterator {
 	public Selection(Iterator iter, Predicate... preds) {
 		this.iterator = iter;
 		this.preds = preds;
-		
-		currentTuple = getNext();
+
+		setSchema(iter.getSchema());
+
+		prepareNext();
 	}
 
+	private void prepareNext() {
+
+		currentTuple = null;
+		boolean isSelection;
+
+		while (iterator.hasNext()) {
+			currentTuple = iterator.getNext();
+			isSelection = true;
+
+			for (int i = 0; i < preds.length; i++) { // Check if the current
+														// tuple satisfy all
+														// conditions
+				if (!preds[i].evaluate(currentTuple)) {
+					isSelection = false;
+					break;
+				}
+			}
+
+			if (isSelection) // found a tuple
+				break;
+
+			currentTuple = null;
+		}
+
+	}
 
 	/**
 	 * Gives a one-line explaination of the iterator, repeats the call on any
@@ -38,8 +63,7 @@ public class Selection extends Iterator {
 	 */
 	public void restart() {
 		iterator.restart();
-		currentTuple = getNext();
-		hasNext = true;
+		prepareNext();
 	}
 
 	/**
@@ -60,7 +84,7 @@ public class Selection extends Iterator {
 	 * Returns true if there are more tuples, false otherwise.
 	 */
 	public boolean hasNext() {
-		return hasNext;
+		return currentTuple != null;
 	}
 
 	/**
@@ -70,30 +94,15 @@ public class Selection extends Iterator {
 	 *             if no more tuples
 	 */
 	public Tuple getNext() {
-		if( currentTuple != null) // if no selection has been found, - for initialization of the class - 
-			return currentTuple;
-		
-		currentTuple = null;
-		boolean isSelection;
-
-		while (iterator.hasNext()) {
-			currentTuple = iterator.getNext();
-			isSelection = true;
-			
-			for (int i = 0; i < preds.length; i++) { // Check if the current tuple satisfy all conditions
-				if (!preds[i].evaluate(currentTuple)) {
-					isSelection = false;
-					break;
-				}
-			}
-
-			if (isSelection) // found a tuple
-				break;
+		if (currentTuple != null) { // if no selection has been found, - for
+									// initialization of the class -
+			Tuple tuple = currentTuple;
+			prepareNext();
+			return tuple;
 		}
-		if (!iterator.hasNext())
-			hasNext = false;
 
-		return currentTuple;
+		throw new IllegalStateException("There is no next!");
+
 	}
 
 } // public class Selection extends Iterator

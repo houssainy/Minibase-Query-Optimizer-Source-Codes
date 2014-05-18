@@ -119,10 +119,10 @@ class RelOperatorTest extends TestDriver {
       // test index scan
       saveCounts(null);
       System.out.println("\n  ~> test key scan (Age = 53.9)...\n");
-      SearchKey key = new SearchKey(53.9F);
-      KeyScan keyscan = new KeyScan(s_drivers, index, key, file);
-      keyscan.execute();
-      saveCounts("ixscan");
+//      SearchKey key = new SearchKey(53.9F);
+//      KeyScan keyscan = new KeyScan(s_drivers, index, key, file);
+//      keyscan.execute();
+//      saveCounts("ixscan");
 
       // test selection operator
       saveCounts(null);
@@ -169,7 +169,7 @@ class RelOperatorTest extends TestDriver {
       pro = null;
       sel = null;
       scan = null;
-      keyscan = null;
+//      keyscan = null;
       index = null;
       file = null;
       System.gc();
