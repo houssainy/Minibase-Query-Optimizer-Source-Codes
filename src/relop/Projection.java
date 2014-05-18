@@ -7,18 +7,21 @@ package relop;
 public class Projection extends Iterator {
 
 	private Iterator iterator;
-
+	private Integer[] fields;
+	
 	/**
 	 * Constructs a projection, given the underlying iterator and field numbers.
 	 */
 	public Projection(Iterator iter, Integer... fields) {
 		this.iterator = iter;
-
+		this.fields = fields;
+		
 		// Create the new Schema
 		Schema schema = new Schema(fields.length);
 		for (int i = 0; i < fields.length; i++)
-			schema.initField(i, iter.getSchema().fieldType(i), iter.getSchema()
-					.fieldLength(i), iter.getSchema().fieldName(i));
+			schema.initField(i, iter.getSchema().fieldType(fields[i]), iter.getSchema()
+					.fieldLength(fields[i]), iter.getSchema().fieldName(fields[i]));
+		
 
 		this.setSchema(schema);
 	}
@@ -67,8 +70,13 @@ public class Projection extends Iterator {
 	 */
 	public Tuple getNext() {
 		if(iterator.hasNext()){
-			Tuple tuple = new Tuple(getSchema() ,  iterator.getNext().getData());
-			return tuple;
+			Object[] data = new Object[fields.length];
+			Object[] tuple = iterator.getNext().getAllFields();
+			
+			for (int i = 0; i < data.length; i++) 
+				data[i] = tuple[fields[i]];
+			
+			return new Tuple(getSchema() ,  data);
 		}
 		
 		throw new IllegalStateException("There is no next!");

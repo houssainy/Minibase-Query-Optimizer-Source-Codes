@@ -20,7 +20,7 @@ public class SimpleJoin extends Iterator {
 		this.rightIterator = right;
 		this.preds = preds;
 
-		// Build new Schama
+		// Build new Schema
 		this.setSchema(Schema.join(left.getSchema(), right.getSchema()));
 
 		prepareNextTuple();
