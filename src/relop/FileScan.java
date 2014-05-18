@@ -13,7 +13,6 @@ public class FileScan extends Iterator {
 	private HeapFile heapFile;
 	private HeapScan heapScan;
 	private RID lastRec;
-	private boolean isOpen;
 
 	private Schema schema;
 
@@ -21,11 +20,11 @@ public class FileScan extends Iterator {
 	 * Constructs a file scan, given the schema and heap file.
 	 */
 	public FileScan(Schema schema, HeapFile heapFile) {
-		heapScan = heapFile.openScan();
-		isOpen = true;
 		this.heapFile = heapFile;
 		this.schema = schema;
-		lastRec = new RID();
+		
+		this.heapScan = heapFile.openScan();
+		this.lastRec = new RID();
 	}
 
 	/**
@@ -40,9 +39,6 @@ public class FileScan extends Iterator {
 	 * Restarts the iterator, i.e. as if it were just constructed.
 	 */
 	public void restart() {
-		if (heapScan != null) {
-			heapScan.close();
-		}
 		heapScan = heapFile.openScan();
 	}
 
@@ -50,26 +46,24 @@ public class FileScan extends Iterator {
 	 * Returns true if the iterator is open; false otherwise.
 	 */
 	public boolean isOpen() {
-		return isOpen;
+		return heapScan != null;
 	}
 
 	/**
 	 * Closes the iterator, releasing any resources (i.e. pinned pages).
 	 */
 	public void close() {
-		if (heapScan != null) {
+		if (heapScan != null)
 			heapScan.close();
-		}
+
+		heapScan = null;
 	}
 
 	/**
 	 * Returns true if there are more tuples, false otherwise.
 	 */
 	public boolean hasNext() {
-		if (heapScan != null) {
-			return heapScan.hasNext();
-		}
-		return false;
+		return heapScan.hasNext();
 	}
 
 	/**
@@ -79,12 +73,8 @@ public class FileScan extends Iterator {
 	 *             if no more tuples
 	 */
 	public Tuple getNext() {
-		Tuple tuple = null;
-		if (heapScan != null) {
-			byte[] rec = heapScan.getNext(lastRec);
-			tuple = new Tuple(schema, rec);
-		}
-		return tuple;
+		byte[] rec = heapScan.getNext(lastRec);
+		return new Tuple(schema, rec);
 	}
 
 	/**
