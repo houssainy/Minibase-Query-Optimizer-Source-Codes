@@ -7,56 +7,93 @@ package relop;
  */
 public class Selection extends Iterator {
 
-  /**
-   * Constructs a selection, given the underlying iterator and predicates.
-   */
-  public Selection(Iterator iter, Predicate... preds) {
-    throw new UnsupportedOperationException("Not implemented");
-  }
+	private Iterator iterator;
+	private Predicate[] preds;
 
-  /**
-   * Gives a one-line explaination of the iterator, repeats the call on any
-   * child iterators, and increases the indent depth along the way.
-   */
-  public void explain(int depth) {
-    throw new UnsupportedOperationException("Not implemented");
-  }
+	private boolean hasNext = true;
+	
+	private Tuple currentTuple = null;
 
-  /**
-   * Restarts the iterator, i.e. as if it were just constructed.
-   */
-  public void restart() {
-    throw new UnsupportedOperationException("Not implemented");
-  }
+	/**
+	 * Constructs a selection, given the underlying iterator and predicates.
+	 */
+	public Selection(Iterator iter, Predicate... preds) {
+		this.iterator = iter;
+		this.preds = preds;
+		
+		currentTuple = getNext();
+	}
 
-  /**
-   * Returns true if the iterator is open; false otherwise.
-   */
-  public boolean isOpen() {
-    throw new UnsupportedOperationException("Not implemented");
-  }
 
-  /**
-   * Closes the iterator, releasing any resources (i.e. pinned pages).
-   */
-  public void close() {
-    throw new UnsupportedOperationException("Not implemented");
-  }
+	/**
+	 * Gives a one-line explaination of the iterator, repeats the call on any
+	 * child iterators, and increases the indent depth along the way.
+	 */
+	public void explain(int depth) {
+		iterator.explain(depth);
+	}
 
-  /**
-   * Returns true if there are more tuples, false otherwise.
-   */
-  public boolean hasNext() {
-    throw new UnsupportedOperationException("Not implemented");
-  }
+	/**
+	 * Restarts the iterator, i.e. as if it were just constructed.
+	 */
+	public void restart() {
+		iterator.restart();
+		currentTuple = getNext();
+		hasNext = true;
+	}
 
-  /**
-   * Gets the next tuple in the iteration.
-   * 
-   * @throws IllegalStateException if no more tuples
-   */
-  public Tuple getNext() {
-    throw new UnsupportedOperationException("Not implemented");
-  }
+	/**
+	 * Returns true if the iterator is open; false otherwise.
+	 */
+	public boolean isOpen() {
+		return iterator.isOpen();
+	}
+
+	/**
+	 * Closes the iterator, releasing any resources (i.e. pinned pages).
+	 */
+	public void close() {
+		iterator.close();
+	}
+
+	/**
+	 * Returns true if there are more tuples, false otherwise.
+	 */
+	public boolean hasNext() {
+		return hasNext;
+	}
+
+	/**
+	 * Gets the next tuple in the iteration.
+	 * 
+	 * @throws IllegalStateException
+	 *             if no more tuples
+	 */
+	public Tuple getNext() {
+		if( currentTuple != null) // if no selection has been found, - for initialization of the class - 
+			return currentTuple;
+		
+		currentTuple = null;
+		boolean isSelection;
+
+		while (iterator.hasNext()) {
+			currentTuple = iterator.getNext();
+			isSelection = true;
+			
+			for (int i = 0; i < preds.length; i++) { // Check if the current tuple satisfy all conditions
+				if (!preds[i].evaluate(currentTuple)) {
+					isSelection = false;
+					break;
+				}
+			}
+
+			if (isSelection) // found a tuple
+				break;
+		}
+		if (!iterator.hasNext())
+			hasNext = false;
+
+		return currentTuple;
+	}
 
 } // public class Selection extends Iterator
