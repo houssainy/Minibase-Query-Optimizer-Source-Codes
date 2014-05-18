@@ -2,5 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="C:/Users/Mohamed/Google Drive/College/Third Year/Second Term/Database/Labs/project/minibase_query_optimizer_source_codes/part_1/lib/bufmgr.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mohamed/Google Drive/College/Third Year/Second Term/Database/Labs/project/minibase_query_optimizer_source_codes/part_1/lib/diskmgr.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mohamed/Google Drive/College/Third Year/Second Term/Database/Labs/project/minibase_query_optimizer_source_codes/part_1/lib/heap.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mohamed/Google Drive/College/Third Year/Second Term/Database/Labs/project/minibase_query_optimizer_source_codes/part_1/lib/index.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
