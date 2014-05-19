@@ -53,6 +53,8 @@ public class SimpleJoin extends Iterator {
 					break pl;
 				}
 			}
+			
+			rightIterator.restart();
 		}
 	}
 
