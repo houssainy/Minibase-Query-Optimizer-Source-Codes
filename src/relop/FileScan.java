@@ -12,7 +12,7 @@ public class FileScan extends Iterator {
 
 	private HeapFile file;
 	private HeapScan scan = null;
-	private RID lastRID = null;
+	private RID lastRID ;
 
 	/**
 	 * Constructs a file scan, given the schema and heap file.
@@ -22,6 +22,8 @@ public class FileScan extends Iterator {
 		
 		this.file = file;
 		this.scan = file.openScan();
+		
+		lastRID = new RID();
 	}
 
 	/**

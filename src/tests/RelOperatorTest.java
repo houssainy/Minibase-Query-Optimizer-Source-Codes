@@ -170,7 +170,7 @@ class RelOperatorTest extends TestDriver {
 			pro = null;
 			sel = null;
 			scan = null;
-//			keyscan = null;
+			keyscan = null;
 			index = null;
 			file = null;
 			System.gc();
