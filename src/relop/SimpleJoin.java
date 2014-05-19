@@ -21,39 +21,69 @@ public class SimpleJoin extends Iterator {
 		this.preds = preds;
 
 		// Build new Schema
-		//TODO
-		this.setSchema(Schema.join(left.getSchema(), right.getSchema()));
+		Schema tempSchema = Schema.join(left.getSchema(), right.getSchema());
+		boolean[] taken = new boolean[tempSchema.getCount()];
+		int count = 0;
+
+		for (int i = 0; i < tempSchema.getCount(); i++) {
+			for (int j = i + 1; j < tempSchema.getCount(); j++) {
+				if (tempSchema.fieldLength(i) == tempSchema.fieldLength(j)
+						&& tempSchema.fieldName(i) == tempSchema.fieldName(j)
+						&& tempSchema.fieldType(i) == tempSchema.fieldType(j)) {
+
+					taken[i] = true;
+					count++;
+				}
+			}
+		}
+
+		Schema joinSchema = new Schema(tempSchema.getCount() - count);
+		int pos = 0;
+
+		for (int i = 0; i < tempSchema.getCount(); i++)
+			if (!taken[i])
+				joinSchema.initField(pos++, tempSchema.fieldType(i),
+						tempSchema.fieldLength(i), tempSchema.fieldName(i));
+
+		this.setSchema(joinSchema);
 
 		prepareNextTuple();
 	}
 
+	Tuple leftTuple = null;
+
 	// Join nested loop
 	private void prepareNextTuple() {
-		Tuple leftTuple = null;
 		Tuple righTuple = null;
-		
+
 		currentTuple = null;
-		pl:while (leftIterator.hasNext()) {// First table
-			
-			leftTuple = leftIterator.getNext();
+		pl: while (leftIterator.hasNext()) {// First table
+
+			if (leftTuple == null)
+				leftTuple = leftIterator.getNext();
+
 			while (rightIterator.hasNext()) { // Second table
 				righTuple = rightIterator.getNext();
-				
+
 				Tuple joinTuple = Tuple.join(leftTuple, righTuple, getSchema());
-				
-				boolean passed = true; 
+
+				boolean passed = true;
 				for (int i = 0; i < preds.length; i++) {
-					if( !preds[i].evaluate(joinTuple)){
+					if (!preds[i].evaluate(joinTuple)) {
 						passed = false;
 						break;
 					}
 				}
-				
-				if( passed ){
-					currentTuple =  joinTuple;
+
+				if (passed) {
+					currentTuple = joinTuple;
 					break pl;
 				}
 			}
+
+			rightIterator.restart();
+
+			leftTuple = null;
 		}
 	}
 
@@ -71,7 +101,7 @@ public class SimpleJoin extends Iterator {
 	public void restart() {
 		leftIterator.restart();
 		rightIterator.restart();
-		
+
 		prepareNextTuple();
 	}
 

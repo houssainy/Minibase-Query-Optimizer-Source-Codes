@@ -10,72 +10,64 @@ import index.HashScan;
  */
 public class KeyScan extends Iterator {
 
-	private final HeapFile file;
-	private final HashScan hashScan;
+	private HeapFile file;
+
+	private HashIndex index;
+	private HashScan scan;
+
+	private SearchKey key;
 
 	/**
 	 * Constructs an index scan, given the hash index and schema.
 	 */
-
 	public KeyScan(Schema schema, HashIndex index, SearchKey key, HeapFile file) {
-
 		this.setSchema(schema);
+
+		this.index = index;
 		this.file = file;
-		// Initiates an equality scan of the index file with specified key.
-		hashScan = index.openScan(key);
+
+		this.key = key;
+
+		this.scan = index.openScan(key);
 
 	}
 
 	/**
-	 * Gives a one-line explanation of the iterator, repeats the call on any
+	 * Gives a one-line explaination of the iterator, repeats the call on any
 	 * child iterators, and increases the indent depth along the way.
 	 */
-	@Override
 	public void explain(int depth) {
-		// TODO: KeyScan explain
-		// use indent method in iterator
-		this.indent(depth);
-
+		throw new UnsupportedOperationException("Not implemented");
 	}
 
 	/**
 	 * Restarts the iterator, i.e. as if it were just constructed.
 	 */
-	@Override
 	public void restart() {
-		// TODO: KeyScan restart
-		throw new UnsupportedOperationException("Not implemented");
+		scan.close();
+		scan = index.openScan(key);
 	}
 
 	/**
 	 * Returns true if the iterator is open; false otherwise.
 	 */
-	@Override
 	public boolean isOpen() {
-
-		if (hashScan != null)
-			return true;
-		return false;
+		return scan != null;
 	}
 
 	/**
 	 * Closes the iterator, releasing any resources (i.e. pinned pages).
 	 */
-	@Override
 	public void close() {
-		if (hashScan != null)
-			hashScan.close();
+		scan.close();
+		scan = null;
 	}
 
 	/**
 	 * Returns true if there are more tuples, false otherwise.
 	 */
-	@Override
 	public boolean hasNext() {
-
-		if (hashScan.hasNext())
-			return true;
-		return false;
+		return scan.hasNext();
 
 	}
 
@@ -85,15 +77,8 @@ public class KeyScan extends Iterator {
 	 * @throws IllegalStateException
 	 *             if no more tuples
 	 */
-	@Override
 	public Tuple getNext() {
+		return new Tuple(getSchema(), file.selectRecord(scan.getNext()));
+	}
 
-		if (hashScan != null && hashScan.hasNext()) {
-			byte[] data = file.selectRecord(hashScan.getNext());
-			Tuple tuple = new Tuple(this.getSchema(), data);
-			return tuple;
-		}
-		return null;
-
-	} // public class KeyScan extends Iterator
-}
+} // public class KeyScan extends Iterator

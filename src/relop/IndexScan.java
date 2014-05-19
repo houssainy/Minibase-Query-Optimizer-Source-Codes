@@ -1,6 +1,5 @@
 package relop;
 
-import global.RID;
 import global.SearchKey;
 import heap.HeapFile;
 import index.BucketScan;
@@ -11,18 +10,20 @@ import index.HashIndex;
  */
 public class IndexScan extends Iterator {
 
-	private Schema schema;
-	private HashIndex index;
 	private HeapFile file;
+
+	private HashIndex index;
 	private BucketScan scan;
 
 	/**
 	 * Constructs an index scan, given the hash index and schema.
 	 */
 	public IndexScan(Schema schema, HashIndex index, HeapFile file) {
-		this.schema = schema;
+		this.setSchema(schema);
+
 		this.index = index;
 		this.file = file;
+
 		this.scan = index.openScan();
 	}
 
@@ -38,8 +39,7 @@ public class IndexScan extends Iterator {
 	 * Restarts the iterator, i.e. as if it were just constructed.
 	 */
 	public void restart() {
-		if(isOpen())
-			scan.close();
+		scan.close();
 		scan = index.openScan();
 	}
 
@@ -72,14 +72,7 @@ public class IndexScan extends Iterator {
 	 *             if no more tuples
 	 */
 	public Tuple getNext() {
-		if (hasNext()) {
-			RID rid = scan.getNext();
-			byte[] rec = file.selectRecord(rid);
-			Tuple tuble = new Tuple(schema, rec);
-			return tuble;
-		} else {
-			throw new IllegalStateException();
-		}
+		return new Tuple(getSchema(), file.selectRecord(scan.getNext()));
 	}
 
 	/**
@@ -94,7 +87,7 @@ public class IndexScan extends Iterator {
 	 * maximum number of buckets if none.
 	 */
 	public int getNextHash() {
-		throw new UnsupportedOperationException("Not implemented");
+		return scan.getNextHash();
 	}
 
 } // public class IndexScan extends Iterator
