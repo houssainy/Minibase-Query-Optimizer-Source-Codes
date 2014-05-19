@@ -21,6 +21,7 @@ public class SimpleJoin extends Iterator {
 		this.preds = preds;
 
 		// Build new Schema
+		//TODO
 		this.setSchema(Schema.join(left.getSchema(), right.getSchema()));
 
 		prepareNextTuple();
